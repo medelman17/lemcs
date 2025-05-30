@@ -20,7 +20,7 @@ redis==5.0.1
 langchain-core>=0.3.63
 langgraph>=0.4.7
 
-# Legal NLP - only eyecite for now
+# Legal NLP - eyecite for citation extraction (compatible with Python 3.12)
 eyecite==2.7.5
 
 # Document processing

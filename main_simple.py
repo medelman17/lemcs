@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 import os
 
-from api.routes import health, documents_simple
+from api.routes import health, documents_simple, citations
 from config.settings_simple import settings
 
 
@@ -32,6 +32,7 @@ app.add_middleware(
 
 app.include_router(health.router, prefix="/api/v1", tags=["health"])
 app.include_router(documents_simple.router, prefix="/api/v1", tags=["documents"])
+app.include_router(citations.router, prefix="/api/v1", tags=["citations"])
 
 
 if __name__ == "__main__":
