@@ -32,7 +32,7 @@ class CitationExtractionResult:
 
 @dataclass
 class CitationAnalysis:
-    """Analysis results for extracted citations"""
+    """Analysis result for a citation's precedential authority"""
     citation: Citation
     court_level: Optional[str] = None
     jurisdiction: Optional[str] = None
@@ -155,38 +155,35 @@ class CitationExtractionService:
     async def _resolve_citation_references(self, citations: List[EyeciteCitation]) -> List[EyeciteCitation]:
         """Resolve supra and id citations to their antecedents"""
         try:
+            # Run resolve_citations in thread pool to avoid blocking
             loop = asyncio.get_event_loop()
-            resolved = await loop.run_in_executor(None, resolve_citations, citations)
-            return resolved
+            resolved_citations = await loop.run_in_executor(None, resolve_citations, citations)
+            return resolved_citations
         except Exception as e:
             logger.warning(f"Citation resolution failed: {e}")
             return citations  # Return unresolved citations if resolution fails
     
     async def _convert_to_db_citation(self, raw_citation: EyeciteCitation, document_id: str) -> Citation:
         """Convert eyecite citation to database model"""
-        citation_type = type(raw_citation).__name__
         
-        # Extract citation components
+        # Extract basic information
+        citation_type = type(raw_citation).__name__
         reporter = getattr(raw_citation, 'reporter', None)
         volume = getattr(raw_citation, 'volume', None)
         page = getattr(raw_citation, 'page', None)
         
-        # Get text span safely
-        try:
-            span = raw_citation.span() if hasattr(raw_citation, 'span') else None
-            position_start = span[0] if span else None
-            position_end = span[1] if span else None
-        except (AttributeError, TypeError):
-            position_start = None
-            position_end = None
+        # Get position in text
+        span = raw_citation.span()
+        position_start = span[0] if span else None
+        position_end = span[1] if span else None
         
         # Calculate confidence score
         confidence_score = self._calculate_confidence_score(raw_citation)
         
-        # Create metadata safely
+        # Get corrected citation text
         try:
-            corrected_citation = raw_citation.corrected_citation() if hasattr(raw_citation, 'corrected_citation') else str(raw_citation)
-        except (AttributeError, TypeError):
+            corrected_citation = raw_citation.corrected_citation()
+        except:
             corrected_citation = str(raw_citation)
             
         metadata = {
@@ -252,10 +249,49 @@ class CitationExtractionService:
         return type_counts
     
     async def _create_citation_embeddings(self, citations: List[Citation], db_session: AsyncSession):
-        """Create vector embeddings for citations (placeholder for now)"""
-        # TODO: Implement when OpenAI integration is added
-        logger.info(f"Embedding creation requested for {len(citations)} citations (not implemented yet)")
-        pass
+        """Create vector embeddings for citations using OpenAI"""
+        if not citations:
+            return
+        
+        # Check if OpenAI is configured
+        if not settings.OPENAI_API_KEY:
+            logger.info("OpenAI API key not configured, skipping embedding creation")
+            return
+        
+        try:
+            # Import OpenAI service (lazy import to avoid dependency issues)
+            from nlp.openai_service import openai_service
+            
+            # Create embeddings for all citations
+            embedding_results = await openai_service.create_citation_embeddings(
+                citations=citations,
+                include_context=True
+            )
+            
+            # Create CitationEmbedding records
+            citation_embeddings = []
+            for citation, embedding_result in zip(citations, embedding_results):
+                citation_embedding = CitationEmbedding(
+                    citation_id=citation.id,
+                    embedding=embedding_result.embedding,
+                    created_at=datetime.utcnow()
+                )
+                citation_embeddings.append(citation_embedding)
+                db_session.add(citation_embedding)
+            
+            # Commit the embeddings
+            await db_session.commit()
+            
+            logger.info(f"Created embeddings for {len(citation_embeddings)} citations "
+                       f"(tokens: {sum(r.tokens_used for r in embedding_results)}, "
+                       f"cached: {sum(1 for r in embedding_results if r.cached)})")
+            
+        except ImportError as e:
+            logger.error(f"Failed to import OpenAI service: {e}")
+            raise
+        except Exception as e:
+            logger.error(f"Failed to create citation embeddings: {e}")
+            # Don't re-raise - embeddings are optional
     
     async def analyze_citation_authority(self, citation: Citation) -> CitationAnalysis:
         """Analyze the precedential authority of a citation"""

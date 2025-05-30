@@ -217,16 +217,50 @@ class CitationExtractorAgent:
             options = state["options"]
             
             if options.get("create_embeddings", False) and settings.OPENAI_API_KEY:
-                # TODO: Implement embedding creation when OpenAI integration is added
-                logger.info("Embedding creation requested but not yet implemented")
-                state["embeddings_created"] = False
+                # Import OpenAI service and create embeddings
+                from nlp.openai_service import openai_service
+                
+                embedding_results = await openai_service.create_citation_embeddings(
+                    citations=citations,
+                    include_context=True
+                )
+                
+                # Create CitationEmbedding records in database
+                db_session = state["db_session"]
+                citation_embeddings = []
+                
+                for citation, embedding_result in zip(citations, embedding_results):
+                    from db.models import CitationEmbedding
+                    citation_embedding = CitationEmbedding(
+                        citation_id=citation.id,
+                        embedding=embedding_result.embedding,
+                        created_at=datetime.utcnow()
+                    )
+                    citation_embeddings.append(citation_embedding)
+                    db_session.add(citation_embedding)
+                
+                await db_session.commit()
+                
+                # Update state with embedding information
+                state["embeddings_created"] = True
+                state["embedding_count"] = len(citation_embeddings)
+                state["embedding_stats"] = {
+                    "total_tokens": sum(r.tokens_used for r in embedding_results),
+                    "cached_count": sum(1 for r in embedding_results if r.cached),
+                    "total_cost_usd": sum(getattr(r, 'cost_usd', 0) for r in embedding_results)
+                }
+                
+                logger.info(f"Created embeddings for {len(citation_embeddings)} citations")
+                
             else:
                 logger.info("Embedding creation skipped (not requested or API key not configured)")
                 state["embeddings_created"] = False
+                state["embedding_count"] = 0
             
             await self._complete_task("create_embeddings", state, {
                 "embeddings_created": state["embeddings_created"],
-                "citations_count": len(citations)
+                "citations_count": len(citations),
+                "embedding_count": state.get("embedding_count", 0)
             })
             
             return state
