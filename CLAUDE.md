@@ -17,39 +17,51 @@ The system employs a multi-agent AI architecture with the following core compone
 
 ## Key Technologies
 
-- Python 3.11+ (primary development language)
-- LangGraph for agent orchestration
-- FastAPI for REST API endpoints
-- PostgreSQL 15+ with pgvector extension
-- Redis for caching and job queuing
-- eyecite for legal citation extraction
-- LexNLP for legal document parsing
-- spaCy with custom legal NER models
-- docxcompose for DOCX manipulation
+- Python 3.12+ (primary development language - validated and working)
+- FastAPI for REST API endpoints (✅ implemented and tested)
+- LangGraph for agent orchestration (⚠️ dependency conflicts with Python 3.12)
+- PostgreSQL 15+ with pgvector extension (planned)
+- Redis for caching and job queuing (planned)
+- eyecite for legal citation extraction (available but not yet integrated)
+- LexNLP for legal document parsing (⚠️ dependency conflicts with Python 3.12)
+- spaCy with custom legal NER models (alternative needed)
+- python-docx for DOCX text extraction (✅ working)
 
 ## Development Commands
 
-Since this is a new project without existing build configuration, the following commands will need to be established:
-
 ### Python Environment Setup
 ```bash
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt  # Once created
+pip install -r requirements-basic.txt  # Core dependencies that work with Python 3.12
+```
+
+### Running the Application
+```bash
+python main_simple.py  # Start development server
+# Application will be available at http://localhost:8000
+# API docs at http://localhost:8000/docs
 ```
 
 ### Running Tests
 ```bash
-pytest tests/  # Standard Python testing
-pytest tests/test_specific.py::test_function  # Run single test
+pytest tests/  # Run all tests
+pytest tests/test_basic.py -v  # Run specific test file with verbose output
 ```
 
 ### Code Quality
 ```bash
-black .  # Code formatting
-flake8 .  # Linting
-mypy .  # Type checking
+black .  # Code formatting (installed and working)
+# Note: flake8 and mypy need to be added to requirements for full linting
 ```
+
+### Validation Status
+✅ **Environment Validated** (Python 3.12.3)
+✅ **FastAPI Application** (Running successfully)
+✅ **Document Upload** (DOCX text extraction working)
+✅ **API Endpoints** (Health check and document routes functional)
+✅ **Testing Framework** (4 passing tests with pytest)
+✅ **Code Formatting** (Black formatter working)
 
 ## Project Structure
 

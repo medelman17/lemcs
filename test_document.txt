@@ -1,0 +1,17 @@
+LEGAL MEMORANDUM
+
+TO: Legal Team
+FROM: Attorney Smith
+DATE: May 30, 2025
+RE: Breach of Contract Analysis
+
+ISSUE
+Whether the defendant's failure to provide timely repairs constitutes a material breach of the lease agreement under California Civil Code Section 1941.
+
+BRIEF ANSWER
+Yes, the defendant's failure to repair the heating system within a reasonable time constitutes a material breach of the warranty of habitability.
+
+DISCUSSION
+The warranty of habitability is implied in all residential leases in California. Landford v. Tenant, 123 Cal. App. 4th 456 (2004). When a landlord fails to maintain essential services, it constitutes a breach.
+
+Here, the defendant failed to repair the heating system for over 30 days despite multiple requests from the tenant.

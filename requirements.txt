@@ -26,7 +26,7 @@ openai==1.8.0
 anthropic==0.8.1
 
 # Legal NLP
-eyecite==2.5.0
+eyecite==2.7.5
 lexnlp==2.3.0
 spacy==3.7.2
 

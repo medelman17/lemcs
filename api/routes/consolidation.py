@@ -26,16 +26,16 @@ async def create_consolidation_job(request: ConsolidationRequest):
     if len(request.document_ids) < 2:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="At least 2 documents are required for consolidation"
+            detail="At least 2 documents are required for consolidation",
         )
-    
+
     job_id = str(uuid.uuid4())
-    
+
     return ConsolidationResponse(
         job_id=job_id,
         status="queued",
         created_at=datetime.utcnow().isoformat(),
-        estimated_completion=datetime.utcnow().isoformat()
+        estimated_completion=datetime.utcnow().isoformat(),
     )
 
 
@@ -47,5 +47,5 @@ async def get_consolidation_status(job_id: str):
         "progress": 65,
         "current_stage": "citation_extraction",
         "stages_completed": ["document_parsing", "legal_nlp_analysis"],
-        "stages_remaining": ["synthesis", "quality_check", "final_formatting"]
+        "stages_remaining": ["synthesis", "quality_check", "final_formatting"],
     }

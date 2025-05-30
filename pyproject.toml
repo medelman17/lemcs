@@ -22,7 +22,7 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-ra -q --cov=. --cov-report=html --cov-report=term-missing"
+addopts = "-ra -q"
 testpaths = [
     "tests",
 ]
