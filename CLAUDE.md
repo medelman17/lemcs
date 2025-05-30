@@ -19,8 +19,8 @@ The system employs a multi-agent AI architecture with the following core compone
 
 - Python 3.12+ (primary development language - validated and working)
 - FastAPI for REST API endpoints (✅ implemented and tested)
-- LangGraph for agent orchestration (⚠️ dependency conflicts with Python 3.12)
-- PostgreSQL 15+ with pgvector extension (planned)
+- LangGraph for agent orchestration (✅ resolved - v0.4.7 compatible with Python 3.12)
+- PostgreSQL 15+ with pgvector extension (✅ implemented with comprehensive schema)
 - Redis for caching and job queuing (planned)
 - eyecite for legal citation extraction (available but not yet integrated)
 - LexNLP for legal document parsing (⚠️ dependency conflicts with Python 3.12)
@@ -38,7 +38,14 @@ pip install -r requirements-basic.txt  # Core dependencies that work with Python
 
 ### Running the Application
 ```bash
-python main_simple.py  # Start development server
+# Start PostgreSQL with pgvector
+docker compose up -d postgres
+
+# Initialize database (first time only)
+DATABASE_URL="postgresql+asyncpg://lemcs_user:lemcs_password@localhost/lemcs" python scripts/init_database.py
+
+# Start development server
+python main_simple.py
 # Application will be available at http://localhost:8000
 # API docs at http://localhost:8000/docs
 ```
@@ -62,6 +69,8 @@ black .  # Code formatting (installed and working)
 ✅ **API Endpoints** (Health check and document routes functional)
 ✅ **Testing Framework** (4 passing tests with pytest)
 ✅ **Code Formatting** (Black formatter working)
+✅ **Database Schema** (PostgreSQL with pgvector, 15 tables for semantic search)
+✅ **Multi-Agent Workflow** (LangGraph integration ready)
 
 ## Project Structure
 
