@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import uvicorn
 
-from api.routes import consolidation, documents, health
+from api.routes import consolidation, documents, health, citations, citation_graph, citation_embeddings
 from config.settings import settings
 
 
@@ -32,6 +32,9 @@ app.add_middleware(
 app.include_router(health.router, prefix="/api/v1", tags=["health"])
 app.include_router(documents.router, prefix="/api/v1", tags=["documents"])
 app.include_router(consolidation.router, prefix="/api/v1", tags=["consolidation"])
+app.include_router(citations.router, prefix="/api/v1", tags=["citations"])
+app.include_router(citation_graph.router, prefix="/api/v1", tags=["citation-graph"])
+app.include_router(citation_embeddings.router, prefix="/api/v1", tags=["citation-embeddings"])
 
 
 if __name__ == "__main__":

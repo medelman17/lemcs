@@ -1,0 +1,258 @@
+# Product Requirements Document
+## Legal Memoranda Consolidation System (LeMCS)
+
+**Version:** 1.0  
+**Date:** May 30, 2025  
+**Author:** Legal Technology Team  
+**Status:** Development in Progress
+
+---
+
+## 1. Executive Summary
+
+The Legal Memoranda Consolidation System (LeMCS) is an AI-powered document processing platform designed to consolidate multiple legal memoranda into comprehensive omnibus documents while preserving all critical legal analysis, citations, and maintaining continuous prose format. The system addresses the challenge of analyzing complex residential lease agreements containing 73+ provisions across 25+ separate memoranda, creating litigation-ready documentation for both individual and class action lawsuits.
+
+### Key Objectives
+- Automate consolidation of multiple legal memoranda without loss of detail
+- Maintain narrative prose format throughout (no bullet point reversion)
+- Preserve all citations, case law references, and legal arguments
+- Create litigation-ready documents suitable for complaint drafting
+- Enable pattern recognition across standardized lease provisions
+
+---
+
+## 2. Technical Requirements Identified from Current Codebase
+
+### 2.1 OpenAI Integration (HIGH PRIORITY)
+- **Requirement**: Implement OpenAI API integration for vector embeddings
+- **Current Status**: TODO comments in citation_extractor.py and citation_service.py
+- **Dependencies**: OpenAI API key configuration, embedding model selection
+- **Impact**: Enables full semantic search capabilities with pgvector
+
+### 2.2 Citation Relationship Resolution (HIGH PRIORITY)
+- **Requirement**: Build sophisticated citation matching algorithm
+- **Current Status**: TODO in citation_service.py line 360
+- **Dependencies**: Database schema for citation relationships
+- **Impact**: Proper legal reference resolution and citation networks
+
+### 2.3 Agent Task Tracking (MEDIUM PRIORITY)
+- **Requirement**: Implement granular task tracking for LangGraph agents
+- **Current Status**: Multiple TODOs in citation_extractor.py
+- **Dependencies**: AgentTask database model
+- **Impact**: Production monitoring and debugging capabilities
+
+### 2.4 Code Quality Improvements (LOW PRIORITY)
+- **Requirement**: Add flake8 and mypy to development workflow
+- **Current Status**: Note in CLAUDE.md
+- **Dependencies**: Requirements file updates
+- **Impact**: Better code quality and type safety
+
+---
+
+## 3. Functional Requirements
+
+### 3.1 Document Processing Pipeline
+- **FR-1.1**: Accept multiple document formats (DOCX, PDF, TXT, MD)
+- **FR-1.2**: Extract text content with metadata preservation
+- **FR-1.3**: Store documents in PostgreSQL with content hashing
+- **FR-1.4**: Track document processing status through workflow stages
+
+### 3.2 Legal Citation Extraction (IMPLEMENTED)
+- **FR-2.1**: Extract legal citations using eyecite with 99%+ accuracy ✅
+- **FR-2.2**: Analyze precedential authority of citations ✅
+- **FR-2.3**: Create citation embeddings for semantic search (TODO)
+- **FR-2.4**: Resolve supra/id citation references (TODO)
+- **FR-2.5**: Build citation relationship networks (TODO)
+
+### 3.3 Multi-Agent Workflow (PARTIAL)
+- **FR-3.1**: LangGraph orchestration system ✅
+- **FR-3.2**: Citation extractor agent ✅
+- **FR-3.3**: Legal analyzer agent ✅
+- **FR-3.4**: Synthesis agent ✅
+- **FR-3.5**: Agent task tracking and monitoring (TODO)
+
+### 3.4 Semantic Search Infrastructure (PARTIAL)
+- **FR-4.1**: PostgreSQL with pgvector extension ✅
+- **FR-4.2**: Document embeddings table schema ✅
+- **FR-4.3**: Citation embeddings implementation (TODO)
+- **FR-4.4**: Semantic similarity search API (TODO)
+
+### 3.5 API and Integration (IMPLEMENTED)
+- **FR-5.1**: FastAPI REST endpoints ✅
+- **FR-5.2**: MCP server for AI system integration ✅
+- **FR-5.3**: Claude Desktop compatibility ✅
+- **FR-5.4**: Async/await patterns throughout ✅
+
+### 3.6 Quality Assurance and Testing (PARTIAL)
+- **FR-6.1**: Comprehensive test suite ✅
+- **FR-6.2**: Database validation and integrity checks ✅
+- **FR-6.3**: Error handling and logging ✅
+- **FR-6.4**: Performance monitoring (TODO)
+- **FR-6.5**: Type checking and linting (TODO)
+
+---
+
+## 4. Technical Architecture Requirements
+
+### 4.1 Database Schema Enhancement
+- **Requirement**: Complete implementation of all 15 tables from DATABASE_DESIGN.md
+- **Priority**: High
+- **Dependencies**: PostgreSQL with pgvector
+- **Current Status**: Core tables implemented, embeddings tables need completion
+
+### 4.2 AI/ML Integration
+- **Requirement**: Full OpenAI API integration with rate limiting and fallbacks
+- **Priority**: High
+- **Dependencies**: OpenAI API key, usage monitoring
+- **Current Status**: Placeholder implementations exist
+
+### 4.3 Performance Optimization
+- **Requirement**: Meet performance targets (25 docs < 10 min, >99% accuracy)
+- **Priority**: Medium
+- **Dependencies**: Production-like testing environment
+- **Current Status**: Basic implementation complete, optimization needed
+
+### 4.4 Security and Compliance
+- **Requirement**: GDPR/CCPA compliance, audit logging, encryption
+- **Priority**: High for production
+- **Dependencies**: Legal review, security audit
+- **Current Status**: Basic audit logging implemented
+
+---
+
+## 5. Development Priorities
+
+### Phase 1: Complete Core Functionality (Weeks 1-2)
+1. Implement OpenAI embedding integration
+2. Complete citation relationship resolution
+3. Add comprehensive error handling
+4. Enhance agent task tracking
+
+### Phase 2: Quality and Performance (Weeks 3-4)
+1. Add type checking and linting
+2. Performance optimization and monitoring
+3. Comprehensive test coverage
+4. Documentation updates
+
+### Phase 3: Advanced Features (Weeks 5-6)
+1. Semantic search API endpoints
+2. Advanced citation analysis
+3. Document consolidation pipeline
+4. Human-in-the-loop workflows
+
+### Phase 4: Production Readiness (Weeks 7-8)
+1. Security hardening
+2. Production deployment scripts
+3. Monitoring and alerting
+4. User documentation
+
+---
+
+## 6. Success Metrics
+
+### 6.1 Technical Metrics
+- **Citation Accuracy**: >99% extraction accuracy (eyecite integration)
+- **Processing Speed**: <30 seconds per memorandum
+- **System Uptime**: 99.9% availability
+- **API Response Time**: <2 seconds for document operations
+
+### 6.2 Quality Metrics
+- **Test Coverage**: >90% code coverage
+- **Type Safety**: 100% type hints with mypy validation
+- **Code Quality**: flake8 compliance
+- **Security**: Zero critical vulnerabilities
+
+### 6.3 Business Metrics
+- **Document Throughput**: 100+ documents per day
+- **Error Rate**: <1% processing failures
+- **User Adoption**: Integration with Claude Desktop
+- **Time Savings**: 90% reduction in manual citation extraction
+
+---
+
+## 7. Technical Debt and TODOs
+
+### Immediate TODOs (from code analysis):
+1. **OpenAI Integration**: agents/citation_extractor.py:219, nlp/citation_service.py:255
+2. **Citation Matching**: nlp/citation_service.py:360
+3. **Task Tracking**: agents/citation_extractor.py:327,332,337
+4. **Linting Setup**: Add flake8 and mypy to requirements
+
+### Architecture Improvements:
+1. Redis integration for caching and job queuing
+2. Comprehensive API documentation
+3. Production logging and monitoring
+4. Backup and disaster recovery procedures
+
+### Performance Optimizations:
+1. Database query optimization
+2. Async processing improvements
+3. Memory usage optimization
+4. Concurrent processing scaling
+
+---
+
+## 8. Dependencies and Integrations
+
+### External APIs:
+- OpenAI API for embeddings and language processing
+- PostgreSQL with pgvector for semantic search
+- Redis for caching and job queuing
+
+### Current Technology Stack:
+- Python 3.12+ ✅
+- FastAPI ✅
+- LangGraph ✅
+- eyecite ✅
+- spaCy + LEGAL-BERT ✅
+- SQLAlchemy with AsyncPG ✅
+- MCP (Model Context Protocol) ✅
+
+### Required Integrations:
+- Claude Desktop (MCP server implemented)
+- Document management systems
+- Legal databases and case law APIs
+- Notification and alerting systems
+
+---
+
+## 9. Acceptance Criteria
+
+The system will be considered production-ready when:
+
+1. All TODO items from code analysis are resolved
+2. OpenAI integration is fully functional with rate limiting
+3. Citation relationship resolution is accurate and complete
+4. Agent task tracking provides comprehensive monitoring
+5. Type checking and linting are integrated into CI/CD
+6. Performance targets are met in production-like environment
+7. Security audit is completed and all issues resolved
+8. Documentation is complete and user-tested
+
+---
+
+## 10. Current Implementation Status
+
+### ✅ Completed:
+- Core FastAPI application with async patterns
+- PostgreSQL database with pgvector extension
+- LangGraph multi-agent architecture
+- eyecite citation extraction with >99% accuracy
+- MCP server for AI system integration
+- Basic test suite and validation
+- Docker containerization setup
+
+### 🔄 In Progress:
+- OpenAI API integration for embeddings
+- Citation relationship resolution
+- Agent workflow monitoring
+- Performance optimization
+
+### ❌ Pending:
+- Semantic search API endpoints
+- Document consolidation pipeline
+- Human-in-the-loop workflows
+- Production security hardening
+- Comprehensive monitoring and alerting
+
+This PRD reflects the current state of the LeMCS codebase and provides clear direction for completing the remaining development tasks to achieve a production-ready legal document processing platform. 

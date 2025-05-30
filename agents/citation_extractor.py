@@ -117,7 +117,8 @@ class CitationExtractorAgent:
                 document=document,
                 db_session=db_session,
                 resolve_references=options.get("resolve_references", True),
-                create_embeddings=False  # Handle separately for better control
+                create_embeddings=False,  # Handle separately for better control
+                create_relationships=options.get("create_relationships", True)
             )
             
             # Update state
@@ -125,16 +126,20 @@ class CitationExtractorAgent:
             state["extraction_result"] = extraction_result
             state["metrics"]["extraction_time_ms"] = extraction_result.processing_time_ms
             state["metrics"]["total_citations"] = len(extraction_result.citations)
+            state["metrics"]["relationships_created"] = extraction_result.extraction_stats.get("relationships_created", 0)
             
             if extraction_result.errors:
                 state["errors"].extend(extraction_result.errors)
             
             await self._complete_task("extract_citations", state, {
                 "citations_found": len(extraction_result.citations),
+                "relationships_created": state["metrics"]["relationships_created"],
                 "extraction_stats": extraction_result.extraction_stats
             })
             
-            logger.info(f"Extracted {len(extraction_result.citations)} citations from document {document.id}")
+            logger.info(f"Extracted {len(extraction_result.citations)} citations "
+                       f"and created {state['metrics']['relationships_created']} relationships "
+                       f"from document {document.id}")
             
             return state
             

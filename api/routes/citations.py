@@ -26,6 +26,7 @@ class CitationExtractionRequest(BaseModel):
     resolve_references: bool = Field(True, description="Whether to resolve supra/id citations")
     create_embeddings: bool = Field(False, description="Whether to create vector embeddings")
     analyze_authority: bool = Field(True, description="Whether to analyze citation authority")
+    create_relationships: bool = Field(True, description="Whether to create citation relationships")
 
 
 class CitationResponse(BaseModel):
@@ -95,7 +96,8 @@ async def extract_citations(
         options = {
             "resolve_references": request.resolve_references,
             "create_embeddings": request.create_embeddings,
-            "analyze_authority": request.analyze_authority
+            "analyze_authority": request.analyze_authority,
+            "create_relationships": request.create_relationships
         }
         
         # Run citation extraction workflow
