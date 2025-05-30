@@ -20,7 +20,7 @@ import re
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 
-from nlp.citation_service import CitationService
+from nlp.citation_service import CitationExtractionService
 from nlp.semantic_similarity import SemanticSimilarityService
 
 logger = logging.getLogger(__name__)
@@ -69,7 +69,7 @@ class LegalTheorySynthesisService:
     """
     
     def __init__(self):
-        self.citation_service = CitationService()
+        self.citation_service = CitationExtractionService()
         self.semantic_service = SemanticSimilarityService()
         self.llm = ChatOpenAI(
             model="gpt-4-turbo-preview",

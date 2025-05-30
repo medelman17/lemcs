@@ -95,3 +95,8 @@ node_modules/
 # Task files
 tasks.json
 tasks/ 
+
+# Generated output files
+outputs/
+
+fixtures/memos/

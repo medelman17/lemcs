@@ -22,7 +22,7 @@ import difflib
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 
-from nlp.citation_service import CitationService
+from nlp.citation_service import CitationExtractionService
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +109,7 @@ class CitationDeduplicationService:
     """
     
     def __init__(self):
-        self.citation_service = CitationService()
+        self.citation_service = CitationExtractionService()
         self.llm = ChatOpenAI(
             model="gpt-4-turbo-preview",
             temperature=0.1,

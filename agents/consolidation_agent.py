@@ -23,7 +23,7 @@ from langchain_openai import ChatOpenAI
 from agents.base import BaseAgent, AgentState
 from agents.workflow_tracking_mixin import WorkflowTrackingMixin
 from db.models import AgentType
-from nlp.citation_service import CitationService
+from nlp.citation_service import CitationExtractionService
 from nlp.semantic_similarity import SemanticSimilarityService
 
 logger = logging.getLogger(__name__)
@@ -74,7 +74,7 @@ class ConsolidationAgent(BaseAgent, WorkflowTrackingMixin):
     
     def __init__(self):
         super().__init__("ConsolidationAgent")
-        self.citation_service = CitationService()
+        self.citation_service = CitationExtractionService()
         self.semantic_service = SemanticSimilarityService()
         self.llm = ChatOpenAI(
             model="gpt-4-turbo-preview",
@@ -102,7 +102,7 @@ class ConsolidationAgent(BaseAgent, WorkflowTrackingMixin):
             "quality_metrics": {}
         }
         
-        async with self.track_workflow("document_consolidation", AgentType.SYNTHESIZER, state,
+        async with self.track_workflow("document_consolidation", AgentType.SYNTHESIS_AGENT, state,
                                      {"memoranda_count": len(memoranda_data), "strategy": consolidation_strategy}):
             
             # Step 1: Analyze and group memoranda by legal theory
@@ -287,11 +287,12 @@ class ConsolidationAgent(BaseAgent, WorkflowTrackingMixin):
             response = await self.llm.ainvoke([HumanMessage(content=prompt)])
             
             # Extract citations from the generated content
-            citations = await self.citation_service.extract_citations(response.content)
+            citations_result = await self.citation_service.extract_citations(response.content)
+            citations_list = citations_result.get('citations', [])
             
             return CRRACCSection(
                 content=response.content,
-                supporting_citations=[c.get('full_citation', '') for c in citations],
+                supporting_citations=[c.get('text', '') for c in citations_list],
                 source_memoranda=list(range(len(memoranda_data))),
                 confidence_score=0.85
             )
@@ -330,11 +331,12 @@ class ConsolidationAgent(BaseAgent, WorkflowTrackingMixin):
         try:
             response = await self.llm.ainvoke([HumanMessage(content=prompt)])
             
-            citations = await self.citation_service.extract_citations(response.content)
+            citations_result = await self.citation_service.extract_citations(response.content)
+            citations_list = citations_result.get('citations', [])
             
             return CRRACCSection(
                 content=response.content,
-                supporting_citations=[c.get('full_citation', '') for c in citations],
+                supporting_citations=[c.get('text', '') for c in citations_list],
                 source_memoranda=list(range(len(memoranda_data))),
                 confidence_score=0.90
             )
@@ -366,11 +368,12 @@ class ConsolidationAgent(BaseAgent, WorkflowTrackingMixin):
         try:
             response = await self.llm.ainvoke([HumanMessage(content=prompt)])
             
-            citations = await self.citation_service.extract_citations(response.content)
+            citations_result = await self.citation_service.extract_citations(response.content)
+            citations_list = citations_result.get('citations', [])
             
             return CRRACCSection(
                 content=response.content,
-                supporting_citations=[c.get('full_citation', '') for c in citations],
+                supporting_citations=[c.get('text', '') for c in citations_list],
                 source_memoranda=list(range(len(memoranda_data))),
                 confidence_score=0.88
             )
@@ -402,11 +405,12 @@ class ConsolidationAgent(BaseAgent, WorkflowTrackingMixin):
         try:
             response = await self.llm.ainvoke([HumanMessage(content=prompt)])
             
-            citations = await self.citation_service.extract_citations(response.content)
+            citations_result = await self.citation_service.extract_citations(response.content)
+            citations_list = citations_result.get('citations', [])
             
             return CRRACCSection(
                 content=response.content,
-                supporting_citations=[c.get('full_citation', '') for c in citations],
+                supporting_citations=[c.get('text', '') for c in citations_list],
                 source_memoranda=list(range(len(memoranda_data))),
                 confidence_score=0.87
             )
@@ -438,11 +442,12 @@ class ConsolidationAgent(BaseAgent, WorkflowTrackingMixin):
         try:
             response = await self.llm.ainvoke([HumanMessage(content=prompt)])
             
-            citations = await self.citation_service.extract_citations(response.content)
+            citations_result = await self.citation_service.extract_citations(response.content)
+            citations_list = citations_result.get('citations', [])
             
             return CRRACCSection(
                 content=response.content,
-                supporting_citations=[c.get('full_citation', '') for c in citations],
+                supporting_citations=[c.get('text', '') for c in citations_list],
                 source_memoranda=list(range(len(memoranda_data))),
                 confidence_score=0.82
             )
@@ -475,11 +480,12 @@ class ConsolidationAgent(BaseAgent, WorkflowTrackingMixin):
         try:
             response = await self.llm.ainvoke([HumanMessage(content=prompt)])
             
-            citations = await self.citation_service.extract_citations(response.content)
+            citations_result = await self.citation_service.extract_citations(response.content)
+            citations_list = citations_result.get('citations', [])
             
             return CRRACCSection(
                 content=response.content,
-                supporting_citations=[c.get('full_citation', '') for c in citations],
+                supporting_citations=[c.get('text', '') for c in citations_list],
                 source_memoranda=list(range(len(memoranda_data))),
                 confidence_score=0.89
             )

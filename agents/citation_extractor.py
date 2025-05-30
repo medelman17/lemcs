@@ -370,10 +370,10 @@ class CitationExtractorAgent:
             return None
         
         try:
-            from db.database import get_session
+            from db.database import get_db
             from db.models import AgentTask, AgentTaskStatus
             
-            async with get_session() as db_session:
+            async with get_db() as db_session:
                 # Get parent task if exists
                 parent_task_id = state.get("current_task_id")
                 
@@ -411,10 +411,10 @@ class CitationExtractorAgent:
             return
         
         try:
-            from db.database import get_session
+            from db.database import get_db
             from db.models import AgentTask, AgentTaskStatus
             
-            async with get_session() as db_session:
+            async with get_db() as db_session:
                 task = await db_session.get(AgentTask, task_id)
                 if task:
                     task.status = AgentTaskStatus.COMPLETED
@@ -439,10 +439,10 @@ class CitationExtractorAgent:
             return
         
         try:
-            from db.database import get_session
+            from db.database import get_db
             from db.models import AgentTask, AgentTaskStatus
             
-            async with get_session() as db_session:
+            async with get_db() as db_session:
                 task = await db_session.get(AgentTask, task_id)
                 if task:
                     task.status = AgentTaskStatus.FAILED

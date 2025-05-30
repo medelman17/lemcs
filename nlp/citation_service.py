@@ -822,6 +822,36 @@ class CitationExtractionService:
             stats["error_rate"] = stats["total_errors"] / stats["total_processed"]
         
         return stats
+    
+    async def extract_citations(self, text: str) -> Dict[str, Any]:
+        """
+        Simple wrapper for extracting citations from text content.
+        Used by consolidation agent for text-based citation extraction.
+        """
+        try:
+            # Extract raw citations from text
+            raw_citations = await self._extract_raw_citations(text)
+            
+            # Convert to simple format for consolidation agent
+            citations = []
+            for citation in raw_citations:
+                citations.append({
+                    "text": str(citation),
+                    "type": getattr(citation, 'type', 'unknown'),
+                    "source": "text_extraction"
+                })
+            
+            return {
+                "citations": citations,
+                "total_count": len(citations)
+            }
+            
+        except Exception as e:
+            logger.error(f"Failed to extract citations from text: {e}")
+            return {
+                "citations": [],
+                "total_count": 0
+            }
 
 
 # Global service instance

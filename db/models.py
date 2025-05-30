@@ -229,6 +229,7 @@ class AgentWorkflow(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     consolidation_job_id = Column(UUID(as_uuid=True), ForeignKey("consolidation_jobs.id"))
     
+    workflow_type = Column(String(100), nullable=False)  # "document_consolidation", "citation_analysis", etc.
     agent_type = Column(Enum(AgentType), nullable=False)
     status = Column(Enum(WorkflowStatus), default=WorkflowStatus.QUEUED)
     
@@ -244,6 +245,7 @@ class AgentWorkflow(Base):
     token_usage = Column(JSON)
     quality_score = Column(Float)
     retry_count = Column(Integer, default=0)
+    max_retries = Column(Integer, default=3)
     
     created_at = Column(DateTime, default=datetime.utcnow)
     
@@ -265,9 +267,11 @@ class AgentTask(Base):
     # Task ordering and dependencies
     sequence_number = Column(Integer)
     depends_on_task_id = Column(UUID(as_uuid=True), ForeignKey("agent_tasks.id"))
+    parent_task_id = Column(UUID(as_uuid=True), ForeignKey("agent_tasks.id"))
     
     started_at = Column(DateTime)
     completed_at = Column(DateTime)
+    execution_time_ms = Column(Integer)
     
     input_data = Column(JSON)
     output_data = Column(JSON)

@@ -10,10 +10,10 @@ from typing import Dict, Any, Optional
 from datetime import datetime
 from contextlib import asynccontextmanager
 
-from db.database import get_session
+from db.database import get_db
 from db.models import (
-    AgentWorkflow, AgentTask, AgentWorkflowStatus, 
-    AgentTaskStatus, AgentType
+    AgentWorkflow, AgentTask, WorkflowStatus, 
+    AgentType
 )
 
 logger = logging.getLogger(__name__)
@@ -44,11 +44,11 @@ class WorkflowTrackingMixin:
         
         try:
             # Create workflow record
-            async with get_session() as db_session:
+            async with get_db() as db_session:
                 workflow = AgentWorkflow(
                     workflow_type=workflow_type,
                     agent_type=agent_type,
-                    status=AgentWorkflowStatus.RUNNING,
+                    status=WorkflowStatus.RUNNING,
                     started_at=datetime.utcnow(),
                     input_data=input_data or {}
                 )
@@ -65,10 +65,10 @@ class WorkflowTrackingMixin:
             yield workflow_id
             
             # Mark workflow as completed
-            async with get_session() as db_session:
+            async with get_db() as db_session:
                 workflow = await db_session.get(AgentWorkflow, workflow_id)
                 if workflow:
-                    workflow.status = AgentWorkflowStatus.COMPLETED
+                    workflow.status = WorkflowStatus.COMPLETED
                     workflow.completed_at = datetime.utcnow()
                     workflow.execution_time_ms = int(
                         (workflow.completed_at - workflow.started_at).total_seconds() * 1000
@@ -83,10 +83,10 @@ class WorkflowTrackingMixin:
             # Mark workflow as failed
             if workflow_id:
                 try:
-                    async with get_session() as db_session:
+                    async with get_db() as db_session:
                         workflow = await db_session.get(AgentWorkflow, workflow_id)
                         if workflow:
-                            workflow.status = AgentWorkflowStatus.FAILED
+                            workflow.status = WorkflowStatus.FAILED
                             workflow.completed_at = datetime.utcnow()
                             workflow.execution_time_ms = int(
                                 (workflow.completed_at - workflow.started_at).total_seconds() * 1000
@@ -119,7 +119,7 @@ class WorkflowTrackingMixin:
         
         try:
             # Create task record
-            async with get_session() as db_session:
+            async with get_db() as db_session:
                 # Get parent task if exists
                 parent_task_id = state.get("current_task_id")
                 
@@ -127,7 +127,7 @@ class WorkflowTrackingMixin:
                     workflow_id=workflow_id,
                     task_type=task_type,
                     parent_task_id=parent_task_id,
-                    status=AgentTaskStatus.RUNNING,
+                    status=WorkflowStatus.RUNNING,
                     started_at=datetime.utcnow(),
                     input_data=input_data or {}
                 )
@@ -154,10 +154,10 @@ class WorkflowTrackingMixin:
             yield task_id
             
             # Mark task as completed
-            async with get_session() as db_session:
+            async with get_db() as db_session:
                 task = await db_session.get(AgentTask, task_id)
                 if task:
-                    task.status = AgentTaskStatus.COMPLETED
+                    task.status = WorkflowStatus.COMPLETED
                     task.completed_at = datetime.utcnow()
                     task.execution_time_ms = int(
                         (task.completed_at - task.started_at).total_seconds() * 1000
@@ -184,10 +184,10 @@ class WorkflowTrackingMixin:
             # Mark task as failed
             if task_id:
                 try:
-                    async with get_session() as db_session:
+                    async with get_db() as db_session:
                         task = await db_session.get(AgentTask, task_id)
                         if task:
-                            task.status = AgentTaskStatus.FAILED
+                            task.status = WorkflowStatus.FAILED
                             task.completed_at = datetime.utcnow()
                             task.execution_time_ms = int(
                                 (task.completed_at - task.started_at).total_seconds() * 1000
@@ -213,7 +213,7 @@ class WorkflowTrackingMixin:
     async def update_workflow_progress(self, workflow_id: int, progress_data: Dict[str, Any]):
         """Update workflow with progress information"""
         try:
-            async with get_session() as db_session:
+            async with get_db() as db_session:
                 workflow = await db_session.get(AgentWorkflow, workflow_id)
                 if workflow:
                     # Merge progress data into output_data
@@ -234,14 +234,14 @@ class WorkflowTrackingMixin:
         Returns True if retry is allowed, False otherwise.
         """
         try:
-            async with get_session() as db_session:
+            async with get_db() as db_session:
                 workflow = await db_session.get(AgentWorkflow, workflow_id)
                 if workflow:
                     workflow.retry_count += 1
                     can_retry = workflow.retry_count < workflow.max_retries
                     
                     if can_retry:
-                        workflow.status = AgentWorkflowStatus.RUNNING
+                        workflow.status = WorkflowStatus.RUNNING
                         logger.info(f"Retrying workflow {workflow_id} (attempt {workflow.retry_count + 1}/{workflow.max_retries})")
                     
                     await db_session.commit()
