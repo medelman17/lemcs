@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 import os
 
-from api.routes import health, documents_simple, citations
+from api.routes import health, documents_simple, citations, semantic_similarity, agent_workflows
 from config.settings_simple import settings
 
 
@@ -33,6 +33,8 @@ app.add_middleware(
 app.include_router(health.router, prefix="/api/v1", tags=["health"])
 app.include_router(documents_simple.router, prefix="/api/v1", tags=["documents"])
 app.include_router(citations.router, prefix="/api/v1", tags=["citations"])
+app.include_router(semantic_similarity.router, prefix="/api/v1", tags=["semantic_similarity"])
+app.include_router(agent_workflows.router, prefix="/api/v1", tags=["agent_workflows"])
 
 
 if __name__ == "__main__":

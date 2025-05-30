@@ -362,20 +362,102 @@ class CitationExtractorAgent:
             
             await db_session.commit()
     
-    async def _start_task(self, task_type: str, state: Dict[str, Any]):
+    async def _start_task(self, task_type: str, state: Dict[str, Any]) -> Optional[str]:
         """Start tracking a specific task"""
-        # TODO: Implement detailed task tracking when needed
-        logger.debug(f"Starting task: {task_type}")
+        workflow_id = state.get("workflow_id")
+        if not workflow_id:
+            logger.warning(f"No workflow_id in state, skipping task tracking for {task_type}")
+            return None
+        
+        try:
+            from db.database import get_session
+            from db.models import AgentTask, AgentTaskStatus
+            
+            async with get_session() as db_session:
+                # Get parent task if exists
+                parent_task_id = state.get("current_task_id")
+                
+                task = AgentTask(
+                    workflow_id=workflow_id,
+                    task_type=task_type,
+                    parent_task_id=parent_task_id,
+                    status=AgentTaskStatus.RUNNING,
+                    started_at=datetime.utcnow(),
+                    input_data={
+                        "document_id": state.get("document_id"),
+                        "page_count": state.get("page_count", 0),
+                        "current_page": state.get("current_page", 0)
+                    }
+                )
+                
+                db_session.add(task)
+                await db_session.commit()
+                await db_session.refresh(task)
+                
+                # Store task ID in state for later reference
+                state[f"{task_type}_task_id"] = task.id
+                logger.debug(f"Started task: {task_type} (ID: {task.id})")
+                return task.id
+                
+        except Exception as e:
+            logger.error(f"Failed to create task record: {e}")
+            return None
     
     async def _complete_task(self, task_type: str, state: Dict[str, Any], output_data: Dict[str, Any]):
         """Complete a specific task"""
-        # TODO: Implement detailed task tracking when needed
-        logger.debug(f"Completed task: {task_type}")
+        task_id = state.get(f"{task_type}_task_id")
+        if not task_id:
+            logger.debug(f"No task ID for {task_type}, skipping task completion tracking")
+            return
+        
+        try:
+            from db.database import get_session
+            from db.models import AgentTask, AgentTaskStatus
+            
+            async with get_session() as db_session:
+                task = await db_session.get(AgentTask, task_id)
+                if task:
+                    task.status = AgentTaskStatus.COMPLETED
+                    task.completed_at = datetime.utcnow()
+                    task.output_data = output_data
+                    
+                    # Calculate execution time
+                    if task.started_at:
+                        task.execution_time_ms = int((task.completed_at - task.started_at).total_seconds() * 1000)
+                    
+                    await db_session.commit()
+                    logger.debug(f"Completed task: {task_type} (ID: {task.id})")
+                    
+        except Exception as e:
+            logger.error(f"Failed to update task record: {e}")
     
     async def _fail_task(self, task_type: str, state: Dict[str, Any], error_message: str):
         """Mark a task as failed"""
-        # TODO: Implement detailed task tracking when needed
-        logger.error(f"Failed task: {task_type} - {error_message}")
+        task_id = state.get(f"{task_type}_task_id")
+        if not task_id:
+            logger.error(f"Failed task: {task_type} - {error_message}")
+            return
+        
+        try:
+            from db.database import get_session
+            from db.models import AgentTask, AgentTaskStatus
+            
+            async with get_session() as db_session:
+                task = await db_session.get(AgentTask, task_id)
+                if task:
+                    task.status = AgentTaskStatus.FAILED
+                    task.completed_at = datetime.utcnow()
+                    task.error_message = error_message
+                    
+                    # Calculate execution time
+                    if task.started_at:
+                        task.execution_time_ms = int((task.completed_at - task.started_at).total_seconds() * 1000)
+                    
+                    await db_session.commit()
+                    logger.error(f"Failed task: {task_type} (ID: {task.id}) - {error_message}")
+                    
+        except Exception as e:
+            logger.error(f"Failed to update task record: {e}")
     
     def _calculate_quality_score(self, final_state: Dict[str, Any]) -> float:
         """Calculate overall quality score for the extraction"""
