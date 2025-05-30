@@ -23,8 +23,9 @@ The system employs a multi-agent AI architecture with the following core compone
 - PostgreSQL 15+ with pgvector extension (✅ implemented with comprehensive schema)
 - Redis for caching and job queuing (planned)
 - eyecite for legal citation extraction (✅ fully integrated with multi-agent workflow)
-- LexNLP for legal document parsing (⚠️ dependency conflicts with Python 3.12)
-- spaCy with custom legal NER models (alternative needed)
+- spaCy + LEGAL-BERT hybrid for legal NLP (✅ Python 3.12 compatible, replaces LexNLP)
+- Hugging Face transformers with legal models (✅ nlpaueb/legal-bert-base-uncased integrated)
+- Legal NLP service with transformer models (✅ comprehensive entity extraction, semantic analysis)
 - python-docx for DOCX text extraction (✅ working)
 
 ## Development Commands
@@ -85,7 +86,7 @@ black .  # Code formatting (installed and working)
 ✅ **Database Schema** (PostgreSQL with pgvector, 15 tables for semantic search)
 ✅ **Multi-Agent Workflow** (LangGraph integration ready)
 ✅ **Citation Extraction** (eyecite integration with >99% accuracy, authority analysis)
-✅ **Legal NLP Pipeline** (Citation service, agent workflow, API endpoints)
+✅ **Legal NLP Pipeline** (Citation service, hybrid spaCy + LEGAL-BERT, semantic analysis, agent workflow, API endpoints)
 ✅ **MCP Server** (Model Context Protocol server tested and working - 12 tools, 2 resources)
 ✅ **End-to-End Testing** (Document upload, citation extraction, authority analysis via MCP)
 
