@@ -35,6 +35,9 @@ The system employs a multi-agent AI architecture with the following core compone
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements-basic.txt  # Core dependencies that work with Python 3.12
+
+# Install additional NLP and AI dependencies
+pip install langchain-core langchain-openai eyecite spacy numpy scikit-learn pgvector greenlet
 ```
 
 ### Running the Application
@@ -49,6 +52,19 @@ DATABASE_URL="postgresql+asyncpg://lemcs_user:lemcs_password@localhost/lemcs" py
 python main_simple.py
 # Application will be available at http://localhost:8000
 # API docs at http://localhost:8000/docs
+```
+
+### Document Consolidation Workflow
+```bash
+# Test the consolidation pipeline with fixture memos
+python scripts/test_consolidation_basic.py
+
+# API endpoints for consolidation:
+# POST /consolidation/jobs - Create consolidation job
+# GET /consolidation/jobs/{job_id} - Check job status  
+# GET /consolidation/jobs/{job_id}/result - Get final result
+# POST /consolidation/document-grouping - Analyze document grouping
+# POST /consolidation/citation-analysis - Analyze citations
 ```
 
 ### Running MCP Server
@@ -66,8 +82,18 @@ DATABASE_URL="postgresql+asyncpg://lemcs_user:lemcs_password@localhost/lemcs" py
 
 ### Running Tests
 ```bash
-pytest tests/  # Run all tests
-pytest tests/test_basic.py -v  # Run specific test file with verbose output
+# Activate virtual environment first
+source venv/bin/activate
+
+# Run all tests
+pytest tests/  
+
+# Run specific test suites
+pytest tests/test_basic.py -v  # Basic functionality tests
+pytest tests/test_consolidation_pipeline.py -v  # Full consolidation pipeline tests
+
+# Run basic consolidation test (without pytest)
+python scripts/test_consolidation_basic.py
 ```
 
 ### Code Quality
@@ -81,14 +107,19 @@ black .  # Code formatting (installed and working)
 ✅ **FastAPI Application** (Running successfully)
 ✅ **Document Upload** (DOCX text extraction working)
 ✅ **API Endpoints** (Health check, document upload, citation extraction)
-✅ **Testing Framework** (4 passing tests with pytest)
+✅ **Testing Framework** (pytest with comprehensive test suite)
 ✅ **Code Formatting** (Black formatter working)
 ✅ **Database Schema** (PostgreSQL with pgvector, 15 tables for semantic search)
-✅ **Multi-Agent Workflow** (LangGraph integration ready)
+✅ **Multi-Agent Workflow** (LangGraph integration with workflow tracking)
 ✅ **Citation Extraction** (eyecite integration with >99% accuracy, authority analysis)
 ✅ **Legal NLP Pipeline** (Citation service, hybrid spaCy + LEGAL-BERT, semantic analysis, agent workflow, API endpoints)
 ✅ **MCP Server** (Model Context Protocol server tested and working - 12 tools, 2 resources)
 ✅ **End-to-End Testing** (Document upload, citation extraction, authority analysis via MCP)
+✅ **Document Consolidation Pipeline** (Complete CRRACC implementation with multi-agent architecture)
+✅ **Semantic Search & Analysis** (Vector embeddings, similarity scoring, advanced filtering)
+✅ **Agent Task Tracking** (Granular workflow monitoring and progress tracking)
+✅ **Citation Management** (Deduplication, normalization, authority ranking)
+✅ **Legal Theory Synthesis** (Content synthesis engine with redundancy elimination)
 
 ## Project Structure
 
