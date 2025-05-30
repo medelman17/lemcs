@@ -1,0 +1,141 @@
+---
+description: Legal NLP processing guidelines using hybrid spaCy + LEGAL-BERT system
+globs: ["nlp/**/*.py", "tests/test_*nlp*.py", "agents/**/*.py"]
+alwaysApply: false
+---
+
+# Legal NLP Guidelines
+
+The LeMCS legal NLP system uses a hybrid approach combining spaCy's speed with LEGAL-BERT's semantic understanding.
+
+## Primary Service: HybridLegalNLP
+
+**Always use `nlp.hybrid_legal_nlp.HybridLegalNLP`** for all legal text processing:
+
+```python
+from nlp.hybrid_legal_nlp import HybridLegalNLP
+
+# Initialize once (expensive operation)
+nlp = HybridLegalNLP()
+
+# Comprehensive analysis (recommended for all legal documents)
+analysis = nlp.comprehensive_analysis(legal_text)
+
+# Entity extraction across multiple models
+entities = nlp.extract_all_entities(text)
+
+# Document similarity using LEGAL-BERT
+similarity = nlp.calculate_similarity(doc1, doc2)
+```
+
+## Legal NLP Architecture
+
+### Core Components
+1. **HybridLegalNLP** (@nlp/hybrid_legal_nlp.py) - Primary interface
+2. **LegalBERTService** (@nlp/legal_bert_service.py) - Semantic analysis
+3. **LegalNLPService** (@nlp/legal_nlp_service.py) - Fast spaCy processing
+4. **CitationService** (@nlp/citation_service.py) - eyecite integration
+
+### Performance Characteristics
+- **spaCy**: ~0.027s (fast entity extraction)
+- **LEGAL-BERT**: ~0.052s (semantic analysis)
+- **Hybrid**: Optimal balance of speed + accuracy
+
+### When to Use Each Component
+
+#### Use HybridLegalNLP (Recommended Default)
+- Comprehensive legal document analysis
+- Production legal workflows
+- When you need both speed and accuracy
+
+#### Use spaCy Service Directly
+- Real-time processing requirements
+- Simple entity extraction
+- High-volume batch processing
+
+#### Use LEGAL-BERT Service Directly
+- Document classification tasks
+- Semantic similarity calculations
+- Legal concept extraction
+
+## Legal Document Types
+
+1. **lease_agreement**: Residential/commercial leases
+2. **legal_complaint**: Litigation documents
+3. **legal_memorandum**: Legal analysis documents
+4. **contract**: Commercial agreements
+5. **unknown**: Unclassified documents
+
+## Entity Types Extracted
+
+### Standard Entities (spaCy)
+- PERSON: Names of individuals
+- ORG: Organizations, companies
+- GPE: Geopolitical entities
+- DATE: Dates and time expressions
+- MONEY: Monetary amounts
+
+### Legal-Specific Entities
+- Case citations (e.g., "123 F.3d 456")
+- Statutes (e.g., "42 U.S.C. § 1983")
+- Legal concepts (plaintiff, defendant, breach)
+- Contract terms and clauses
+
+## Common Patterns
+
+### Document Processing Pipeline
+```python
+# Process legal document
+analysis = nlp.comprehensive_analysis(document_text)
+
+# Extract structured data
+doc_type = analysis['document_analysis']['type']
+entities = analysis['entities']['combined_unique']
+concepts = analysis['entities']['legal_concepts']
+complexity = analysis['document_analysis']['complexity_score']
+```
+
+### Semantic Search Implementation
+```python
+# Get embeddings for similarity search
+query_embedding = nlp.get_text_embedding(query_text)
+
+# Calculate similarity between documents
+similarity_score = nlp.calculate_similarity(doc1, doc2)
+```
+
+## Error Handling
+
+### Model Loading Failures
+```python
+try:
+    nlp = HybridLegalNLP()
+except Exception as e:
+    logger.error(f"Failed to load legal NLP models: {e}")
+    # Implement graceful fallback
+```
+
+### Processing Errors
+```python
+try:
+    analysis = nlp.comprehensive_analysis(text)
+except Exception as e:
+    logger.error(f"Legal NLP processing failed: {e}")
+    # Return basic structure with error info
+    analysis = {"error": str(e), "document_analysis": {"type": "unknown"}}
+```
+
+## Best Practices
+
+1. **Cache model instances** - they're expensive to load
+2. **Batch process** multiple documents when possible
+3. **Validate inputs** - ensure text is legal document content
+4. **Handle errors gracefully** - legal processing shouldn't crash systems
+5. **Test with real legal documents** - use actual lease agreements, complaints
+6. **Log performance metrics** - track processing times and accuracy
+
+## Reference Files
+@nlp/hybrid_legal_nlp.py
+@nlp/legal_bert_service.py
+@nlp/legal_nlp_service.py
+@tests/test_hybrid_nlp.py

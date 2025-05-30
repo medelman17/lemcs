@@ -3,7 +3,27 @@
     "allow": [
       "Bash(find:*)",
       "Bash(mkdir:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(source:*)",
+      "Bash(pip install:*)",
+      "Bash(python -m pytest tests/test_basic.py -v)",
+      "Bash(python:*)",
+      "Edit(**)",
+      "Read(**)",
+      "WebFetch",
+      "Bash(./venv/bin/pip list)",
+      "Bash(./venv/bin/pip install pgvector)",
+      "Bash(grep:*)",
+      "Bash(./venv/bin/python:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker compose:*)",
+      "Bash(export DATABASE_URL=\"postgresql+asyncpg://lemcs_user:lemcs_password@localhost/lemcs\")",
+      "Bash(./venv/bin/python:*)",
+      "Bash(./venv/bin/pip install eyecite)",
+      "Bash(pytest:*)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }
