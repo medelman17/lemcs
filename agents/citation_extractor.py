@@ -242,7 +242,7 @@ class CitationExtractorAgent:
         try:
             # Compile final results
             final_results = {
-                "document_id": state["document"].id,
+                "document_id": str(state["document"].id),
                 "citations": [
                     {
                         "id": str(c.id),
@@ -289,7 +289,7 @@ class CitationExtractorAgent:
             agent_type=AgentType.CITATION_EXTRACTOR,
             status=WorkflowStatus.RUNNING,
             started_at=datetime.utcnow(),
-            input_data={"document_id": document_id},
+            input_data={"document_id": str(document_id)},
             retry_count=0
         )
         

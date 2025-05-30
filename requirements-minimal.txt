@@ -20,6 +20,9 @@ redis==5.0.1
 langchain-core>=0.3.63
 langgraph>=0.4.7
 
+# MCP (Model Context Protocol) - for exposing LeMCS as standardized tools
+mcp>=1.2.0
+
 # Legal NLP - eyecite for citation extraction (compatible with Python 3.12)
 eyecite==2.7.5
 

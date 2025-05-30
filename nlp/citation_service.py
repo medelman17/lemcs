@@ -171,18 +171,27 @@ class CitationExtractionService:
         volume = getattr(raw_citation, 'volume', None)
         page = getattr(raw_citation, 'page', None)
         
-        # Get text span
-        span = raw_citation.span()
-        position_start = span[0] if span else None
-        position_end = span[1] if span else None
+        # Get text span safely
+        try:
+            span = raw_citation.span() if hasattr(raw_citation, 'span') else None
+            position_start = span[0] if span else None
+            position_end = span[1] if span else None
+        except (AttributeError, TypeError):
+            position_start = None
+            position_end = None
         
         # Calculate confidence score
         confidence_score = self._calculate_confidence_score(raw_citation)
         
-        # Create metadata
+        # Create metadata safely
+        try:
+            corrected_citation = raw_citation.corrected_citation() if hasattr(raw_citation, 'corrected_citation') else str(raw_citation)
+        except (AttributeError, TypeError):
+            corrected_citation = str(raw_citation)
+            
         metadata = {
             "original_text": str(raw_citation),
-            "corrected_citation": raw_citation.corrected_citation(),
+            "corrected_citation": corrected_citation,
             "citation_class": citation_type,
             "groups": getattr(raw_citation, 'groups', {}),
             "court": getattr(raw_citation, 'court', None),
@@ -198,7 +207,7 @@ class CitationExtractionService:
         
         return Citation(
             document_id=document_id,
-            citation_text=raw_citation.corrected_citation(),
+            citation_text=corrected_citation,
             citation_type=citation_type,
             reporter=str(reporter) if reporter else None,
             volume=str(volume) if volume else None,

@@ -50,6 +50,19 @@ python main_simple.py
 # API docs at http://localhost:8000/docs
 ```
 
+### Running MCP Server
+```bash
+# Start MCP server for integration with Claude Desktop or other AI systems
+DATABASE_URL="postgresql+asyncpg://lemcs_user:lemcs_password@localhost/lemcs" python mcp_server/server.py
+# Server exposes LeMCS functionality through standardized MCP tools
+# Configure in Claude Desktop settings to access legal document processing tools
+
+# Test MCP tools (examples)
+# upload_document("/path/to/document.txt") - Upload and process documents
+# extract_citations(doc_id) - Extract legal citations with authority analysis
+# search_citations("landlord tenant") - Search citations by text content
+```
+
 ### Running Tests
 ```bash
 pytest tests/  # Run all tests
@@ -73,6 +86,8 @@ black .  # Code formatting (installed and working)
 ✅ **Multi-Agent Workflow** (LangGraph integration ready)
 ✅ **Citation Extraction** (eyecite integration with >99% accuracy, authority analysis)
 ✅ **Legal NLP Pipeline** (Citation service, agent workflow, API endpoints)
+✅ **MCP Server** (Model Context Protocol server tested and working - 12 tools, 2 resources)
+✅ **End-to-End Testing** (Document upload, citation extraction, authority analysis via MCP)
 
 ## Project Structure
 
@@ -82,6 +97,7 @@ The codebase should be organized following the microservices architecture outlin
 - `/nlp` - Legal NLP processing modules
 - `/document` - Document processing and manipulation
 - `/db` - Database models and migrations
+- `/mcp_server` - Model Context Protocol server for AI system integration (renamed to avoid conflicts)
 - `/tests` - Test suite
 
 ## Legal Document Processing Methodology
